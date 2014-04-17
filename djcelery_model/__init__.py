@@ -1,5 +1,6 @@
 """
-django-celery-model is an extension to Celery and django-celery that supports tasks aligned to Django models.
+django-celery-model is an extension to Celery and django-celery which adds
+support for tracking Celery tasks assigned to Django model instances.
 """
 
 __version_info__ = {
