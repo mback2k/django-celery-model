@@ -5,7 +5,7 @@ django-celery-model is an extension to Celery and django-celery that supports ta
 __version_info__ = {
     'major': 0,
     'minor': 0,
-    'micro': 1,
+    'micro': 2,
     'releaselevel': 'dev',
 }
 
