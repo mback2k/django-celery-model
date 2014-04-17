@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from celery.result import BaseAsyncResult
@@ -18,9 +19,7 @@ class ModelTaskMetaState(object):
     def lookup(cls, state):
         return getattr(cls, state)
 
-class ModelTaskMetaManager(models.Manager):
-    use_for_related_fields = True
-
+class ModelTaskMetaFilterMixin(object):
     def pending(self):
         return self.filter(state=ModelTaskMetaState.PENDING)
 
@@ -44,6 +43,15 @@ class ModelTaskMetaManager(models.Manager):
     def ready(self):
         return self.filter(Q(state=ModelTaskMetaState.FAILURE)|
                            Q(state=ModelTaskMetaState.SUCCESS))
+
+class ModelTaskMetaQuerySet(QuerySet, ModelTaskMetaFilterMixin):
+    pass
+
+class ModelTaskMetaManager(models.Manager, ModelTaskMetaFilterMixin):
+    use_for_related_fields = True
+
+    def get_queryset(self):
+        return ModelTaskMetaQuerySet(self.model, using=self._db)
 
 class ModelTaskMeta(models.Model):
     STATES = (
