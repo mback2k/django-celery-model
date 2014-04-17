@@ -66,6 +66,10 @@ class ModelTaskMeta(models.Model):
     def __unicode__(self):
         return u'%s: %s' % (self.task_id, dict(self.STATES)[self.state])
 
+    @property
+    def result(self):
+        return ModelAsyncResult(self.task_id)
+
 class ModelAsyncResult(BaseAsyncResult):
     def forget(self):
         ModelTaskMeta.objects.filter(task_id=self.id).delete()
@@ -104,13 +108,10 @@ class TaskMixin(object):
         return task.apply_async(*args, **kwargs)
 
     def get_task_results(self):
-        return map(lambda task_id: ModelAsyncResult(task_id),
-                   self.tasks.values_list('task_id', flat=True))
+        return map(lambda x: x.result, self.tasks.all())
 
     def get_task_result(self, task_id):
-        if self.tasks.filter(task_id=task_id).exists():
-            return ModelAsyncResult(task_id)
-        return BaseAsyncResult(task_id)
+        return self.tasks.get(task_id=task_id).result
 
     def clear_task_results(self):
         map(forget_if_ready, self.get_task_results())
