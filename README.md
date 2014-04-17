@@ -53,9 +53,10 @@ Retrieve list of asynchronous tasks assigned to your Django model instance:
     mymodel.tasks.successful()
     mymodel.tasks.ready()
 
-Check if there is a running asynchronous task for your Django model instance:
+Check for a running or ready asynchronous task for your Django model instance:
 
     mymodel.has_running_task
+    mymodel.has_ready_task
 
 Handle asynchronous task results for your Django model instance:
 

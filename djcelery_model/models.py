@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.db.models import Q
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from celery.result import BaseAsyncResult
@@ -21,22 +22,28 @@ class ModelTaskMetaManager(models.Manager):
     use_for_related_fields = True
 
     def pending(self):
-        return self.filter(state__exact=ModelTaskMetaState.PENDING)
+        return self.filter(state=ModelTaskMetaState.PENDING)
 
     def started(self):
-        return self.filter(state__exact=ModelTaskMetaState.STARTED)
+        return self.filter(state=ModelTaskMetaState.STARTED)
 
     def retrying(self):
-        return self.filter(state__exact=ModelTaskMetaState.RETRY)
+        return self.filter(state=ModelTaskMetaState.RETRY)
 
     def failed(self):
-        return self.filter(state__exact=ModelTaskMetaState.FAILURE)
+        return self.filter(state=ModelTaskMetaState.FAILURE)
 
     def successful(self):
-        return self.filter(state__exact=ModelTaskMetaState.SUCCESS)
+        return self.filter(state=ModelTaskMetaState.SUCCESS)
+
+    def running(self):
+        return self.filter(Q(state=ModelTaskMetaState.PENDING)|
+                           Q(state=ModelTaskMetaState.STARTED)|
+                           Q(state=ModelTaskMetaState.RETRY))
 
     def ready(self):
-        return self.filter(state__gte=ModelTaskMetaState.FAILURE)
+        return self.filter(Q(state=ModelTaskMetaState.FAILURE)|
+                           Q(state=ModelTaskMetaState.SUCCESS))
 
 class ModelTaskMeta(models.Model):
     STATES = (
@@ -74,6 +81,14 @@ class TaskMixin(object):
         queryset = ModelTaskMeta.objects.filter(content_type=content_type)
         return queryset.filter(object_id=self.pk)
 
+    @property
+    def has_running_task(self):
+        return self.tasks.running().exists()
+
+    @property
+    def has_ready_task(self):
+        return self.tasks.ready().exists()
+
     def apply_async(self, task, *args, **kwargs):
         if 'task_id' in kwargs:
             task_id = kwargs['task_id']
@@ -102,10 +117,6 @@ class TaskMixin(object):
 
     def clear_task_result(self, task_id):
         forget_if_ready(self.get_task_result(task_id))
-
-    @property
-    def has_running_task(self):
-        return len(filter(lambda x: not x.ready(), self.get_task_results())) > 0
 
 def forget_if_ready(async_result):
     if async_result and async_result.ready():
