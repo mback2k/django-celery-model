@@ -44,10 +44,10 @@ class ModelTaskMetaFilterMixin(object):
         return self.filter(Q(state=ModelTaskMetaState.FAILURE)|
                            Q(state=ModelTaskMetaState.SUCCESS))
 
-class ModelTaskMetaQuerySet(QuerySet, ModelTaskMetaFilterMixin):
+class ModelTaskMetaQuerySet(ModelTaskMetaFilterMixin, QuerySet):
     pass
 
-class ModelTaskMetaManager(models.Manager, ModelTaskMetaFilterMixin):
+class ModelTaskMetaManager(ModelTaskMetaFilterMixin, models.Manager):
     use_for_related_fields = True
 
     def get_queryset(self):
