@@ -83,15 +83,11 @@ class ModelAsyncResult(BaseAsyncResult):
         ModelTaskMeta.objects.filter(task_id=self.id).delete()
         return super(ModelAsyncResult, self).forget()
 
-class TaskMixin(object):
+class TaskMixin(models.Model):
+    tasks = generic.GenericRelation(ModelTaskMeta)
+
     class Meta:
         abstract = True
-
-    @property
-    def tasks(self):
-        content_type = ContentType.objects.get_for_model(self)
-        queryset = ModelTaskMeta.objects.filter(content_type=content_type)
-        return queryset.filter(object_id=self.pk)
 
     @property
     def has_running_task(self):

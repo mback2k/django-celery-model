@@ -32,7 +32,7 @@ Add the TaskMixin to your Django model:
     from django.utils.translation import ugettext_lazy as _
     from djcelery_model.models import TaskMixin
 
-    class MyModel(models.Model, TaskMixin):
+    class MyModel(TaskMixin, models.Model):
         name = models.CharField(_('Name'), max_length=100)
 
 Queue an asynchronous task from your Django model instance:
