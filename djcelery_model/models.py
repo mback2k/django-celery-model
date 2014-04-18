@@ -78,13 +78,81 @@ class ModelTaskMeta(models.Model):
     def result(self):
         return ModelAsyncResult(self.task_id)
 
+
 class ModelAsyncResult(BaseAsyncResult):
     def forget(self):
         ModelTaskMeta.objects.filter(task_id=self.id).delete()
         return super(ModelAsyncResult, self).forget()
 
+
+class TaskFilterMixin(object):
+    def with_tasks(self):
+        return self.filter(tasks__state__isnull=False)
+
+    def with_pending_tasks(self):
+        return self.filter(tasks__state=ModelTaskMetaState.PENDING)
+
+    def with_started_tasks(self):
+        return self.filter(tasks__state=ModelTaskMetaState.STARTED)
+
+    def with_retrying_tasks(self):
+        return self.filter(tasks__state=ModelTaskMetaState.RETRY)
+
+    def with_failed_tasks(self):
+        return self.filter(tasks__state=ModelTaskMetaState.FAILURE)
+
+    def with_successful_tasks(self):
+        return self.filter(tasks__state=ModelTaskMetaState.SUCCESS)
+
+    def with_running_tasks(self):
+        return self.filter(Q(tasks__state=ModelTaskMetaState.PENDING)|
+                           Q(tasks__state=ModelTaskMetaState.STARTED)|
+                           Q(tasks__state=ModelTaskMetaState.RETRY))
+
+    def with_ready_tasks(self):
+        return self.filter(Q(tasks__state=ModelTaskMetaState.FAILURE)|
+                           Q(tasks__state=ModelTaskMetaState.SUCCESS))
+
+    def without_tasks(self):
+        return self.exclude(tasks__state__isnull=False)
+
+    def without_pending_tasks(self):
+        return self.exclude(tasks__state=ModelTaskMetaState.PENDING)
+
+    def without_started_tasks(self):
+        return self.exclude(tasks__state=ModelTaskMetaState.STARTED)
+
+    def without_retrying_tasks(self):
+        return self.exclude(tasks__state=ModelTaskMetaState.RETRY)
+
+    def without_failed_tasks(self):
+        return self.exclude(tasks__state=ModelTaskMetaState.FAILURE)
+
+    def without_successful_tasks(self):
+        return self.exclude(tasks__state=ModelTaskMetaState.SUCCESS)
+
+    def without_running_tasks(self):
+        return self.exclude(Q(tasks__state=ModelTaskMetaState.PENDING)|
+                            Q(tasks__state=ModelTaskMetaState.STARTED)|
+                            Q(tasks__state=ModelTaskMetaState.RETRY))
+
+    def without_ready_tasks(self):
+        return self.exclude(Q(tasks__state=ModelTaskMetaState.FAILURE)|
+                            Q(tasks__state=ModelTaskMetaState.SUCCESS))
+
+class TaskQuerySet(TaskFilterMixin, QuerySet):
+    pass
+
+class TaskManager(TaskFilterMixin, models.Manager):
+    use_for_related_fields = True
+
+    def get_queryset(self):
+        return TaskQuerySet(self.model, using=self._db)
+
 class TaskMixin(models.Model):
     tasks = generic.GenericRelation(ModelTaskMeta)
+
+    objects = TaskManager()
 
     class Meta:
         abstract = True
@@ -123,9 +191,11 @@ class TaskMixin(models.Model):
     def clear_task_result(self, task_id):
         forget_if_ready(self.get_task_result(task_id))
 
+
 def forget_if_ready(async_result):
     if async_result and async_result.ready():
         async_result.forget()
+
 
 @signals.after_task_publish.connect
 def handle_after_task_publish(sender=None, body=None, **kwargs):

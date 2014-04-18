@@ -65,6 +65,26 @@ Handle asynchronous task results for your Django model instance:
     mymodel.clear_task_results()
     mymodel.clear_task_result(task_id)
 
+Filter your Django model based upon asynchronous tasks:
+
+    MyModel.objects.with_tasks()
+    MyModel.objects.with_pending_tasks()
+    MyModel.objects.with_started_tasks()
+    MyModel.objects.with_retrying_tasks()
+    MyModel.objects.with_failed_tasks()
+    MyModel.objects.with_successful_tasks()
+    MyModel.objects.with_running_tasks()
+    MyModel.objects.with_ready_tasks()
+
+    MyModel.objects.without_tasks()
+    MyModel.objects.without_pending_tasks()
+    MyModel.objects.without_started_tasks()
+    MyModel.objects.without_retrying_tasks()
+    MyModel.objects.without_failed_tasks()
+    MyModel.objects.without_successful_tasks()
+    MyModel.objects.without_running_tasks()
+    MyModel.objects.without_ready_tasks()
+
 License
 -------
 * Released under MIT License
