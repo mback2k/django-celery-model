@@ -5,9 +5,9 @@ support for tracking Celery tasks assigned to Django model instances.
 
 __version_info__ = {
     'major': 0,
-    'minor': 0,
-    'micro': 3,
-    'releaselevel': 'dev',
+    'minor': 1,
+    'micro': 0,
+    'releaselevel': 'final',
 }
 
 def get_version():
