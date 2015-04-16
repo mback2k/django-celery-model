@@ -5,15 +5,13 @@ which adds support for tracking Celery tasks assigned to Django model instances.
 
 Installation
 ------------
-You can install the latest version from GitHub manually:
+Install the latest version from pypi.python.org:
 
-    git clone https://github.com/mback2k/django-celery-model.git
-    cd django-celery-model
-    python setup.py install
+    pip install django-celery-model
 
-or via pip:
+Install the development version by cloning the source from github.com:
 
-    pip install https://github.com/mback2k/django-celery-model/zipball/master
+    pip install git+https://github.com/mback2k/django-celery-model.git
 
 Configuration
 -------------
@@ -89,4 +87,4 @@ Filter your Django model based upon asynchronous tasks:
 License
 -------
 * Released under MIT License
-* Copyright (c) 2014 Marc Hoersken <info@marc-hoersken.de>
+* Copyright (c) 2014-2015 Marc Hoersken <info@marc-hoersken.de>
