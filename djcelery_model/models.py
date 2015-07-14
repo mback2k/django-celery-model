@@ -2,7 +2,16 @@
 from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.contrib.contenttypes import generic
+try:
+    # Django >= 1.7
+    from django.contrib.contenttypes.fields import GenericForeignKey
+except ImportError:
+    from django.contrib.contenttypes.generic import GenericForeignKey
+try:
+    # Django >= 1.7
+    from django.contrib.contenttypes.fields import GenericRelation
+except ImportError:
+    from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from celery.result import BaseAsyncResult
 from celery.utils import uuid
@@ -64,7 +73,7 @@ class ModelTaskMeta(models.Model):
 
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
     task_id = models.CharField(max_length=255, unique=True)
     state = models.PositiveIntegerField(choices=STATES,
                                         default=ModelTaskMetaState.PENDING)
@@ -150,7 +159,7 @@ class TaskManager(TaskFilterMixin, models.Manager):
         return TaskQuerySet(self.model, using=self._db)
 
 class TaskMixin(models.Model):
-    tasks = generic.GenericRelation(ModelTaskMeta)
+    tasks = GenericRelation(ModelTaskMeta)
 
     objects = TaskManager()
 
