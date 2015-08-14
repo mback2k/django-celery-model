@@ -11,7 +11,8 @@ try:
     # Django >= 1.7
     from django.contrib.contenttypes.fields import GenericRelation
 except ImportError:
-    from django.contrib.contenttypes.fields import GenericRelation
+    from django.contrib.contenttypes.generic import GenericRelation
+
 from django.contrib.contenttypes.models import ContentType
 from celery.result import BaseAsyncResult
 from celery.utils import uuid
