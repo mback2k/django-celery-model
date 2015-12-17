@@ -2,18 +2,14 @@
 from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
-try:
-    # Django >= 1.7
-    from django.contrib.contenttypes.fields import GenericForeignKey
-except ImportError:
-    from django.contrib.contenttypes.generic import GenericForeignKey
-try:
-    # Django >= 1.7
-    from django.contrib.contenttypes.fields import GenericRelation
-except ImportError:
-    from django.contrib.contenttypes.generic import GenericRelation
-
 from django.contrib.contenttypes.models import ContentType
+
+try:
+    # Django >= 1.7
+    from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+except ImportError:
+    from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
+
 from celery.result import BaseAsyncResult
 from celery.utils import uuid
 from celery import signals
