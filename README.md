@@ -1,6 +1,6 @@
 [django-celery-model](https://github.com/mback2k/django-celery-model) is an
-extension to [Celery](https://github.com/celery/celery) and
-[django-celery](https://github.com/celery/django-celery)
+extension to [Celery](https://github.com/celery/celery) and depending on the
+Celery version [django-celery](https://github.com/celery/django-celery)
 which adds support for tracking Celery tasks assigned to Django model instances.
 
 Installation
