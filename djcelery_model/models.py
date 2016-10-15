@@ -221,6 +221,12 @@ def handle_task_postrun(sender=None, task_id=None, state=None, **kwargs):
         queryset = ModelTaskMeta.objects.filter(task_id=task_id)
         queryset.update(state=ModelTaskMetaState.lookup(state))
 
+@signals.task_failure.connect
+def handle_task_failure(sender=None, task_id=None, **kwargs):
+    if task_id:
+        queryset = ModelTaskMeta.objects.filter(task_id=task_id)
+        queryset.update(state=ModelTaskMetaState.FAILURE)
+
 @signals.task_revoked.connect
 def handle_task_revoked(sender=None, request=None, **kwargs):
     if request and request.id:
