@@ -87,4 +87,4 @@ Filter your Django model based upon asynchronous tasks:
 License
 -------
 * Released under MIT License
-* Copyright (c) 2014-2015 Marc Hoersken <info@marc-hoersken.de>
+* Copyright (c) 2014-2016 Marc Hoersken <info@marc-hoersken.de>
