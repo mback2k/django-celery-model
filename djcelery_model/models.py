@@ -10,7 +10,7 @@ try:
 except ImportError:
     from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
 
-from celery.result import BaseAsyncResult
+from celery.result import AsyncResult
 from celery.utils import uuid
 from celery import signals
 
@@ -85,7 +85,7 @@ class ModelTaskMeta(models.Model):
         return ModelAsyncResult(self.task_id)
 
 
-class ModelAsyncResult(BaseAsyncResult):
+class ModelAsyncResult(AsyncResult):
     def forget(self):
         ModelTaskMeta.objects.filter(task_id=self.id).delete()
         return super(ModelAsyncResult, self).forget()
@@ -179,7 +179,7 @@ class TaskMixin(models.Model):
         try:
             taskmeta = ModelTaskMeta.objects.get(task_id=task_id)
             taskmeta.content_object = self
-            forget_if_ready(BaseAsyncResult(task_id))
+            forget_if_ready(AsyncResult(task_id))
         except ModelTaskMeta.DoesNotExist:
             taskmeta = ModelTaskMeta(task_id=task_id, content_object=self)
         taskmeta.save()
