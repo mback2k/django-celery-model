@@ -179,10 +179,10 @@ class TaskMixin(models.Model):
             task_id = kwargs['task_id']
         else:
             task_id = kwargs['task_id'] = uuid()
+        forget_if_ready(AsyncResult(task_id))
         try:
             taskmeta = ModelTaskMeta.objects.get(task_id=task_id)
             taskmeta.content_object = self
-            forget_if_ready(AsyncResult(task_id))
         except ModelTaskMeta.DoesNotExist:
             taskmeta = ModelTaskMeta(task_id=task_id, content_object=self)
         taskmeta.save()
