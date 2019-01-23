@@ -80,6 +80,9 @@ class ModelTaskMeta(models.Model):
     def __unicode__(self):
         return u'%s: %s' % (self.task_id, dict(self.STATES)[self.state])
 
+    def __str__(self):
+        return '%s: %s' % (self.task_id, dict(self.STATES)[self.state])
+
     @property
     def result(self):
         return ModelAsyncResult(self.task_id)
@@ -192,10 +195,12 @@ class TaskMixin(models.Model):
         return self.tasks.get(task_id=task_id).result
 
     def clear_task_results(self):
-        map(forget_if_ready, self.get_task_results())
+        for task_result in self.get_task_results():
+            forget_if_ready(task_result)
 
     def clear_task_result(self, task_id):
-        forget_if_ready(self.get_task_result(task_id))
+        task_result = self.get_task_result(task_id)
+        forget_if_ready(task_result)
 
 
 def forget_if_ready(async_result):
