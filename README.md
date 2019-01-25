@@ -20,6 +20,12 @@ Add the package to your `INSTALLED_APPS`:
         'djcelery_model',
     )
 
+Make sure that you are receiving Celery events via:
+
+    CELERY_TASK_TRACK_STARTED = True
+    CELERY_TASK_SEND_SENT_EVENT = True
+    CELERY_SEND_EVENTS = True
+
 Example
 -------
 Add the TaskMixin to your Django model:
@@ -85,4 +91,4 @@ Filter your Django model based upon asynchronous tasks:
 License
 -------
 * Released under MIT License
-* Copyright (c) 2014-2016 Marc Hoersken <info@marc-hoersken.de>
+* Copyright (c) 2014-2019 Marc Hoersken <info@marc-hoersken.de>
