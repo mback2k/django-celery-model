@@ -1,8 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 django-celery-model is an extension to Celery which adds support
 for tracking Celery tasks assigned to Django model instances.
 """
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 __version_info__ = {
     'major': 0,
