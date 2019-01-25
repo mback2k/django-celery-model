@@ -5,6 +5,9 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+setuptools = "*"
+wheel = "*"
+twine = "*"
 
 [packages]
 django = ">=1.11"
