@@ -6,6 +6,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from setuptools import setup, find_packages
+from djcelery_model import __version__ as version
+from djcelery_model import __doc__ as doc
 import os
 
 def read_file(filename):
@@ -19,15 +21,15 @@ def read_file(filename):
 
 setup(
     name='django-celery-model',
-    version=__import__('djcelery_model').__version__,
+    version=version,
     author='Marc Hoersken',
     author_email='info@marc-hoersken.de',
     packages=find_packages(),
     include_package_data=True,
     url='https://github.com/mback2k/django-celery-model',
     license='MIT',
-    description=u' '.join(__import__('djcelery_model').__doc__.splitlines()).strip(),
-    install_requires=['Celery>=3.1.10'],
+    description=' '.join(doc.splitlines()).strip(),
+    install_requires=['django>=1.11', 'celery>=4.2'],
     classifiers=[
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Intended Audience :: Developers',
@@ -38,4 +40,5 @@ setup(
         'Operating System :: OS Independent',
     ],
     long_description=read_file('README.md'),
+    long_description_content_type='text/markdown',
 )
