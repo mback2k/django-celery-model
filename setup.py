@@ -29,7 +29,7 @@ setup(
     url='https://github.com/mback2k/django-celery-model',
     license='MIT',
     description=' '.join(doc.splitlines()).strip(),
-    install_requires=['django>=1.11', 'celery>=4.2'],
+    install_requires=read_file('requirements.txt').splitlines(),
     classifiers=[
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Intended Audience :: Developers',

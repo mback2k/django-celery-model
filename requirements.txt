@@ -1,0 +1,2 @@
+django>=1.11
+celery>=4.2
