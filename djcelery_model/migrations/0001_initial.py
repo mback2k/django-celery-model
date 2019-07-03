@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-
+import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('object_id', models.PositiveIntegerField()),
                 ('task_id', models.CharField(unique=True, max_length=255)),
                 ('state', models.PositiveIntegerField(default=0, choices=[(0, b'PENDING'), (1, b'STARTED'), (2, b'RETRY'), (3, b'FAILURE'), (4, b'SUCCESS')])),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
             },
