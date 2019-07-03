@@ -76,7 +76,7 @@ class ModelTaskMeta(models.Model):
         (ModelTaskMetaState.SUCCESS, 'SUCCESS'),
     )
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
     task_id = models.CharField(max_length=255, unique=True)
