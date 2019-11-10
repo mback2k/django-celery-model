@@ -1,3 +1,4 @@
+from celery.contrib.testing.tasks import ping
 from celery.contrib.testing.worker import start_worker
 from django.test import TestCase, TransactionTestCase
 
@@ -21,3 +22,8 @@ class TestAppIntegrationTests(TestCase):
         self.assertIsInstance(JPEGFile(), TaskMixin)
     
 
+class TestAppCeleryTests(CeleryTestCase):
+    def test_worker(self):
+        result = ping.delay()
+        pong = result.get(timeout=10)
+        self.assertEqual(pong, 'pong')
