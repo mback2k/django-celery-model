@@ -18,3 +18,6 @@ To run tests:
 
 To clean after tests run:
     rm -R /tmp/vagrant
+
+To make migrations (after running tests to create tox environment):
+    /tmp/vagrant/.tox/py35/bin/python /vagrant/manage.py makemigrations
