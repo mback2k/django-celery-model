@@ -63,13 +63,6 @@ DATABASES = {
 
 REDIS_PORT = os.getenv('REDIS_6379_TCP_PORT', 'port-missing-from-env')
 
-CACHES = {
-    'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'localhost:%s' % REDIS_PORT,
-    },
-}
-
 CELERY_BROKER_URL = 'redis://localhost:%s/0' % REDIS_PORT
 CELERY_RESULT_BACKEND = 'redis://localhost:%s/2' % REDIS_PORT
 CELERY_TASK_TRACK_STARTED = True

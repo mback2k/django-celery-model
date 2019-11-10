@@ -1,7 +1,10 @@
 from celery.contrib.testing.worker import start_worker
-from django.test import TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 
+from djcelery_model.models import ModelTaskMeta, TaskMixin
 from djcelery_model.tests import celery_app
+
+from .models import JPEGFile
 
 
 class CeleryTestCase(TransactionTestCase):
@@ -11,3 +14,10 @@ class CeleryTestCase(TransactionTestCase):
     
     def tearDown(self):
         self.celery_worker.__exit__(None, None, None)
+
+
+class TestAppIntegrationTests(TestCase):
+    def test_model_is_taskmixin(self):
+        self.assertIsInstance(JPEGFile(), TaskMixin)
+    
+
