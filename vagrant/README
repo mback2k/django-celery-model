@@ -10,42 +10,11 @@ To run tests:
         bash /vagrant/vagrant/runtox.sh
     
     to run with verbose output:
-        bash /vagrant/vagrant/runtox.sh -- -v 2
+        bash /vagrant/vagrant/runtox.sh -vv -- -v 2
     
     to run a specific test:
-        bash /vagrant/vagrant/runtox.sh -- filestreamview.tests.test_filestreamview.FileStreamViewTests.test_syntax_equal
+        bash /vagrant/vagrant/runtox.sh -vv -- -v 2 path.to.test
     
 
 To clean after tests run:
     rm -R /tmp/vagrant
-
-To use django's manage.py:
-    apt-get install -y python3-pip
-    cd /vagrant
-    pip3 install -r requirements.txt
-    python3 manage.py --help
-
-To use django's manage.py shell:
-    apt-get install -y python3-pip
-    cd /vagrant
-    pip3 install -r requirements.txt
-    python3 manage.py shell
-
-To make migrations:
-    apt-get install -y python3-pip
-    cd /vagrant
-    pip3 install -r requirements.txt
-    python3 manage.py makemigrations
-
-To migrate:
-    apt-get install -y python3-pip
-    cd /vagrant
-    pip3 install -r requirements.txt
-    python3 manage.py migrate
-
-To run tests directly:
-    apt-get install -y python3-pip
-    cd /vagrant
-    pip3 install -r requirements.txt
-    pip3 install -r requirements_dev.txt
-    python3 manage.py test
