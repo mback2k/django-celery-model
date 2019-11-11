@@ -19,7 +19,6 @@ class CeleryTestCase(TransactionTestCase):
     
     def tearDown(self):
         self.celery_worker.__exit__(None, None, None)
-        celery_app.control.purge()
 
 
 class TestAppIntegrationTests(TestCase):
