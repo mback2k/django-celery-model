@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('file', models.FileField(upload_to='')),
-                ('etag', models.CharField(max_length=255)),
+                ('etag', models.CharField(blank=True, max_length=255)),
             ],
             options={
                 'abstract': False,
