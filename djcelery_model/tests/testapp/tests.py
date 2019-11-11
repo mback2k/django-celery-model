@@ -1,3 +1,4 @@
+from time import sleep
 from celery.contrib.testing.tasks import ping
 from celery.contrib.testing.worker import start_worker
 from django.contrib.staticfiles import finders
@@ -47,6 +48,10 @@ class TestAppCeleryTests(CeleryTestCase):
         
         result.get(timeout=10)
         self.assertTrue(result.ready())
+        
+        # not the greatest way to wait for async stuff to happen, but we need
+        # the signals to complete before testing for side effects
+        sleep(3)
         
         self.assertEqual(jpeg.etag, '')
         self.assertFalse(jpeg.has_running_task)
