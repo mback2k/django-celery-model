@@ -14,10 +14,11 @@ from .tasks import calculate_etag
 class CeleryTestCase(TransactionTestCase):
     def setUp(self):
         self.celery_worker = start_worker(celery_app)
-        self.celery_worker.__enter__()
+        celery_app.control.ping()
     
     def tearDown(self):
         self.celery_worker.__exit__(None, None, None)
+        celery_app.control.purge()
 
 
 class TestAppIntegrationTests(TestCase):
