@@ -13,12 +13,12 @@ from .tasks import calculate_etag
 
 class CeleryTestCase(TransactionTestCase):
     def setUp(self):
-        self.celery_worker = start_worker(celery_app)
-        self.celery_worker.__enter__()
+        self.worker_context = start_worker(celery_app, perform_ping_check=False)
+        self.worker = self.worker_context.__enter__()
         celery_app.control.ping()
     
     def tearDown(self):
-        self.celery_worker.__exit__(None, None, None)
+        self.worker_context.__exit__(None, None, None)
 
 
 class TestAppIntegrationTests(TestCase):
