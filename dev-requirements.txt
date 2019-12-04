@@ -1,24 +1,24 @@
--i https://pypi.org/simple
-astroid==2.2.5
+-i https://pypi.org/simple/
+astroid==2.3.3
 bleach==3.1.0
-certifi==2019.9.11
+certifi==2019.11.28
 chardet==3.0.4
 docutils==0.15.2
 idna==2.8
 isort==4.3.21
-lazy-object-proxy==1.4.2
+lazy-object-proxy==1.4.3
 mccabe==0.6.1
 pkginfo==1.5.0.1
-pygments==2.4.2
+pygments==2.5.2
 pylint==2.3.1
 readme-renderer==24.0
 requests-toolbelt==0.9.1
 requests==2.22.0
-six==1.12.0
-tqdm==4.35.0
+six==1.13.0
+tqdm==4.40.0
 twine==1.14.0
-typed-ast==1.4.0 ; implementation_name == 'cpython'
-urllib3==1.25.3
+typed-ast==1.4.0 ; implementation_name == 'cpython' and python_version < '3.8'
+urllib3==1.25.7
 webencodings==0.5.1
 wheel==0.33.6
 wrapt==1.11.2
