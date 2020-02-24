@@ -1,27 +1,32 @@
--i https://pypi.org/simple
+-i https://pypi.org/simple/
 astroid==2.3.3
-bleach==3.1.0
+bleach==3.1.1
 certifi==2019.11.28
+cffi==1.14.0
 chardet==3.0.4
+cryptography==2.8
 docutils==0.16
-idna==2.8
+idna==2.9
 importlib-metadata==1.5.0 ; python_version < '3.8'
 isort==4.3.21
+jeepney==0.4.2 ; sys_platform == 'linux'
 keyring==21.1.0
 lazy-object-proxy==1.4.3
 mccabe==0.6.1
 pkginfo==1.5.0.1
+pycparser==2.19
 pygments==2.5.2
 pylint==2.4.4
 readme-renderer==24.0
 requests-toolbelt==0.9.1
-requests==2.22.0
+requests==2.23.0
+secretstorage==3.1.2 ; sys_platform == 'linux'
 six==1.14.0
-tqdm==4.42.1
+tqdm==4.43.0
 twine==3.1.1
 typed-ast==1.4.1 ; implementation_name == 'cpython' and python_version < '3.8'
 urllib3==1.25.8
 webencodings==0.5.1
 wheel==0.34.2
 wrapt==1.11.2
-zipp==2.2.0
+zipp==3.0.0
