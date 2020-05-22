@@ -9,7 +9,6 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import python_2_unicode_compatible
 
 try:
     # Django >= 1.7
@@ -20,6 +19,8 @@ except ImportError:
 from celery.result import AsyncResult
 from celery.utils import uuid
 from celery import signals
+
+from .compat import python_2_unicode_compatible
 
 class ModelTaskMetaState(object):
     PENDING = 0
