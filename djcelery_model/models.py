@@ -25,7 +25,6 @@ from celery.result import AsyncResult
 from celery.utils import uuid
 from celery import signals
 
-
 class ModelTaskMetaState(object):
     PENDING = 0
     STARTED = 1
