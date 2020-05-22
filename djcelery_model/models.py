@@ -9,7 +9,11 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import python_2_unicode_compatible
+
+try:
+    from six import python_2_unicode_compatible
+except ImportError:
+    from django.utils.encoding import python_2_unicode_compatible
 
 try:
     # Django >= 1.7
