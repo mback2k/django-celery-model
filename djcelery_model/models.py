@@ -11,6 +11,11 @@ from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
 
 try:
+    from six import python_2_unicode_compatible
+except ImportError:
+    from django.utils.encoding import python_2_unicode_compatible
+
+try:
     # Django >= 1.7
     from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 except ImportError:
@@ -20,7 +25,6 @@ from celery.result import AsyncResult
 from celery.utils import uuid
 from celery import signals
 
-from .compat import python_2_unicode_compatible
 
 class ModelTaskMetaState(object):
     PENDING = 0
