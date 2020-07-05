@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 
 try:
     from six import python_2_unicode_compatible
@@ -219,29 +220,34 @@ def forget_if_ready(async_result):
         async_result.forget()
 
 
+def perform_update(queryset, **kwargs):
+    kwargs.setdefault('updated', timezone.now())
+    queryset.update(**kwargs)
+
+
 @signals.after_task_publish.connect
 def handle_after_task_publish(sender=None, body=None, **kwargs):
     if body and 'id' in body:
         queryset = ModelTaskMeta.objects.filter(task_id=body['id'])
-        queryset.update(state=ModelTaskMetaState.PENDING)
+        perform_update(queryset, state=ModelTaskMetaState.PENDING)
 
 @signals.task_prerun.connect
 def handle_task_prerun(sender=None, task_id=None, **kwargs):
     if task_id:
         queryset = ModelTaskMeta.objects.filter(task_id=task_id)
-        queryset.update(state=ModelTaskMetaState.STARTED)
+        perform_update(queryset, state=ModelTaskMetaState.STARTED)
 
 @signals.task_postrun.connect
 def handle_task_postrun(sender=None, task_id=None, state=None, **kwargs):
     if task_id and state:
         queryset = ModelTaskMeta.objects.filter(task_id=task_id)
-        queryset.update(state=ModelTaskMetaState.lookup(state))
+        perform_update(queryset, state=ModelTaskMetaState.lookup(state))
 
 @signals.task_failure.connect
 def handle_task_failure(sender=None, task_id=None, **kwargs):
     if task_id:
         queryset = ModelTaskMeta.objects.filter(task_id=task_id)
-        queryset.update(state=ModelTaskMetaState.FAILURE)
+        perform_update(queryset, state=ModelTaskMetaState.FAILURE)
 
 @signals.task_revoked.connect
 def handle_task_revoked(sender=None, request=None, **kwargs):

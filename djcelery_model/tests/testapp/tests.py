@@ -1,9 +1,12 @@
+import datetime
 from time import sleep
+
 from celery.contrib.testing.tasks import ping
 from celery.contrib.testing.worker import start_worker
 from django.contrib.staticfiles import finders
 from django.core.files import File
 from django.test import TestCase, TransactionTestCase
+from django.utils import timezone
 
 from djcelery_model.models import TaskMixin
 from djcelery_model.tests import celery_app
@@ -62,3 +65,28 @@ class TestAppCeleryTests(CeleryTestCase):
         self.assertEqual(jpeg.etag, '80b098e6cd95b9901fa29799d48731433dfaeab0')
         self.assertFalse(jpeg.has_running_task)
         self.assertTrue(jpeg.has_ready_task)
+
+    def test_signals_set_updated(self):
+        started_at = timezone.now()
+        sleep(1)
+        jpeg = JPEGFile.objects.create(
+            file=File(open(finders.find('testapp/flower.jpg'), 'rb'), name='flower.jpg')
+        )
+        result = jpeg.apply_async(calculate_etag, [jpeg.pk])
+        jpeg.refresh_from_db()
+        taskmeta = jpeg.tasks.filter(task_id=result.id).first()
+        self.assertTrue(taskmeta)
+        
+        updated_at = taskmeta.updated
+        self.assertIsInstance(updated_at, datetime.datetime)
+        self.assertGreater(updated_at, started_at)
+        
+        result.get(timeout=10)
+        self.assertTrue(result.ready())
+        
+        # not the greatest way to wait for async stuff to happen, but we need
+        # the signals to complete before testing for side effects
+        sleep(3)
+        taskmeta.refresh_from_db()
+        self.assertLess(updated_at, taskmeta.updated)
+        self.assertLess(taskmeta.updated, timezone.now())
