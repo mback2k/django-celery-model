@@ -254,8 +254,3 @@ def handle_task_revoked(sender=None, request=None, **kwargs):
     if request and request.id:
         queryset = ModelTaskMeta.objects.filter(task_id=request.id)
         queryset.delete()
-
-@signals.task_retry.connect
-def handle_task_retry(sender=None, request=None, **kwargs):
-    if request and request.id:
-        perform_update(request.id, state=ModelTaskMetaState.RETRY)
