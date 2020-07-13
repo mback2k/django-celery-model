@@ -37,20 +37,15 @@ class ModelTaskMetaTests(SetUpMixin, TestCase):
 class MultiModelStateUpdateTests(SetUpMixin, CeleryTestCase):
     def test_ping_across_models(self):
         task_id = 'c51352f0-cf93-4781-9288-ae5e4a362648'
-        metas = (
-            ModelTaskMeta.objects.create(content_object=self.site_a, task_id=task_id),
-            ModelTaskMeta.objects.create(content_object=self.site_b, task_id=task_id),
-            ModelTaskMeta.objects.create(content_object=self.record, task_id=task_id),
-        )
+        ModelTaskMeta.objects.create(content_object=self.site_a, task_id=task_id)
+        ModelTaskMeta.objects.create(content_object=self.site_b, task_id=task_id)
+        ModelTaskMeta.objects.create(content_object=self.record, task_id=task_id)
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=task_id).count())
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=task_id, state=ModelTaskMetaState.PENDING).count())
         result = ping.apply_async(task_id=task_id)
         time.sleep(1)
         self.assertTrue(result.ready())
         self.assertTrue(result.successful())
-        for meta in metas:
-            meta.refresh_from_db()
-        self.assertEqual(metas[0].state, ModelTaskMetaState.SUCCESS)
-        self.assertEqual(metas[1].state, ModelTaskMetaState.SUCCESS)
-        self.assertEqual(metas[2].state, ModelTaskMetaState.SUCCESS)
-        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=task_id).count())
-        metas[0].result.forget()
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=task_id, state=ModelTaskMetaState.SUCCESS).count())
+        ModelTaskMeta.objects.filter(task_id=task_id).first().result.forget()
         self.assertEqual(0, ModelTaskMeta.objects.filter(task_id=task_id).count())
