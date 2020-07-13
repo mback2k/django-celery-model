@@ -85,5 +85,5 @@ class MultiModelStateUpdateTests(SetUpMixin, CeleryTestCase):
         result = retry_forever.apply_async(task_id=self.task_id)
         time.sleep(1)
         result.revoke()
-        time.sleep(10)
+        time.sleep(30)
         self.assertEqual(0, ModelTaskMeta.objects.filter(task_id=self.task_id).count())
