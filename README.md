@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/thenewguy/django-celery-model.svg?branch=production)](https://travis-ci.org/thenewguy/django-celery-model)
+
 [django-celery-model](https://github.com/mback2k/django-celery-model) is an
 extension to [Celery](https://github.com/celery/celery) which adds support
 for tracking Celery tasks assigned to Django model instances.
