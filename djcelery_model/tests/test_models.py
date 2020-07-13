@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from django.db import IntegrityError
 from django.test import TestCase
 from celery.contrib.testing.tasks import ping
+from celery.utils import uuid
 
 from ..models import ModelTaskMeta, ModelTaskMetaState
 from .base import CeleryTestCase
@@ -35,17 +36,26 @@ class ModelTaskMetaTests(SetUpMixin, TestCase):
 
 
 class MultiModelStateUpdateTests(SetUpMixin, CeleryTestCase):
-    def test_ping_across_models(self):
-        task_id = 'c51352f0-cf93-4781-9288-ae5e4a362648'
-        ModelTaskMeta.objects.create(content_object=self.site_a, task_id=task_id)
-        ModelTaskMeta.objects.create(content_object=self.site_b, task_id=task_id)
-        ModelTaskMeta.objects.create(content_object=self.record, task_id=task_id)
-        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=task_id).count())
-        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=task_id, state=ModelTaskMetaState.PENDING).count())
-        result = ping.apply_async(task_id=task_id)
+    def setUp(self):
+        super().setUp()
+        self.task_id = uuid()
+        ModelTaskMeta.objects.create(content_object=self.site_a, task_id=self.task_id)
+        ModelTaskMeta.objects.create(content_object=self.site_b, task_id=self.task_id)
+        ModelTaskMeta.objects.create(content_object=self.record, task_id=self.task_id)
+    
+    def test_count(self):
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id).count())
+    
+    def test_pending(self):
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id, state=ModelTaskMetaState.PENDING).count())
+    
+    def test_forget(self):
+        ModelTaskMeta.objects.filter(task_id=self.task_id).first().result.forget()
+        self.assertEqual(0, ModelTaskMeta.objects.filter(task_id=self.task_id).count())
+        
+    def test_success(self):
+        result = ping.apply_async(task_id=self.task_id)
         time.sleep(1)
         self.assertTrue(result.ready())
         self.assertTrue(result.successful())
-        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=task_id, state=ModelTaskMetaState.SUCCESS).count())
-        ModelTaskMeta.objects.filter(task_id=task_id).first().result.forget()
-        self.assertEqual(0, ModelTaskMeta.objects.filter(task_id=task_id).count())
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id, state=ModelTaskMetaState.SUCCESS).count())
