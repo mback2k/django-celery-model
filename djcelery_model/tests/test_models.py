@@ -9,6 +9,7 @@ from celery.utils import uuid
 from ..models import ModelTaskMeta, ModelTaskMetaState
 from .base import CeleryTestCase
 from .testapp.models import JPEGFile
+from .testapp.tasks import forced_failure
 
 
 class SetUpMixin(object):
@@ -59,3 +60,10 @@ class MultiModelStateUpdateTests(SetUpMixin, CeleryTestCase):
         self.assertTrue(result.ready())
         self.assertTrue(result.successful())
         self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id, state=ModelTaskMetaState.SUCCESS).count())
+
+    def test_failed(self):
+        result = forced_failure.apply_async(task_id=self.task_id)
+        time.sleep(1)
+        self.assertTrue(result.ready())
+        self.assertTrue(result.failed())
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id, state=ModelTaskMetaState.FAILURE).count())
