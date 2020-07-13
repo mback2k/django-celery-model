@@ -5,11 +5,12 @@ from django.db import IntegrityError
 from django.test import TestCase
 from celery.contrib.testing.tasks import ping
 from celery.utils import uuid
+from celery import states
 
 from ..models import ModelTaskMeta, ModelTaskMetaState
 from .base import CeleryTestCase
 from .testapp.models import JPEGFile
-from .testapp.tasks import forced_failure
+from .testapp.tasks import forced_failure, retry_forever, sleep_for_success
 
 
 class SetUpMixin(object):
@@ -67,3 +68,15 @@ class MultiModelStateUpdateTests(SetUpMixin, CeleryTestCase):
         self.assertTrue(result.ready())
         self.assertTrue(result.failed())
         self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id, state=ModelTaskMetaState.FAILURE).count())
+
+    def test_retried(self):
+        result = retry_forever.apply_async(task_id=self.task_id)
+        time.sleep(1)
+        self.assertEqual(result.state, states.RETRY)
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id, state=ModelTaskMetaState.RETRY).count())
+
+    def test_started(self):
+        result = sleep_for_success.apply_async(task_id=self.task_id)
+        time.sleep(1)
+        self.assertEqual(result.state, states.STARTED)
+        self.assertEqual(3, ModelTaskMeta.objects.filter(task_id=self.task_id, state=ModelTaskMetaState.STARTED).count())
