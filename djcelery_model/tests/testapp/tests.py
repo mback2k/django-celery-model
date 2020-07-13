@@ -3,17 +3,15 @@ from contextlib import contextmanager
 from time import sleep
 from unittest import mock
 
-from celery.contrib.testing.tasks import ping
-from celery.contrib.testing.worker import start_worker
 from django.contrib.staticfiles import finders
 from django.core.files import File
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
 from django.utils import timezone
 
 from djcelery_model.models import ModelTaskMeta, TaskMixin, perform_update
 from djcelery_model.signals import post_bulk_update
-from djcelery_model.tests import celery_app
 
+from ..base import CeleryTestCase
 from .models import JPEGFile
 from .tasks import calculate_etag
 
@@ -46,27 +44,12 @@ class SignalTests(TestCase):
         )
 
 
-class CeleryTestCase(TransactionTestCase):
-    def setUp(self):
-        self.worker_context = start_worker(celery_app, perform_ping_check=False)
-        self.worker = self.worker_context.__enter__()
-        self.worker.ensure_started()
-    
-    def tearDown(self):
-        self.worker_context.__exit__(None, None, None)
-
-
 class TestAppIntegrationTests(TestCase):
     def test_model_is_taskmixin(self):
         self.assertIsInstance(JPEGFile(), TaskMixin)
     
 
 class TestAppCeleryTests(CeleryTestCase):
-    def test_worker(self):
-        result = ping.delay()
-        pong = result.get(timeout=10)
-        self.assertEqual(pong, 'pong')
-    
     def test_state_properties(self):
         jpeg = JPEGFile.objects.create(
             file=File(open(finders.find('testapp/flower.jpg'), 'rb'), name='flower.jpg')
