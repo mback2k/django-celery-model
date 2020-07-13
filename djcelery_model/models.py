@@ -76,6 +76,9 @@ class ModelTaskMetaManager(ModelTaskMetaFilterMixin, models.Manager):
 
 @python_2_unicode_compatible
 class ModelTaskMeta(models.Model):
+    class Meta:
+        unique_together = ('content_type', 'object_id', 'task_id')
+    
     STATES = (
         (ModelTaskMetaState.PENDING, 'PENDING'),
         (ModelTaskMetaState.STARTED, 'STARTED'),
@@ -87,7 +90,7 @@ class ModelTaskMeta(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
-    task_id = models.CharField(max_length=255, unique=True)
+    task_id = models.CharField(max_length=255, db_index=True)
     state = models.PositiveIntegerField(choices=STATES,
                                         default=ModelTaskMetaState.PENDING)
     created = models.DateTimeField(auto_now_add=True, editable=False)
