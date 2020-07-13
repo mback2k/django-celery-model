@@ -56,8 +56,12 @@ STATIC_URL = '/static/'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'pgdb',
+        'USER': 'pguser',
+        'PASSWORD': 'pgpass',
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_5432_TCP_PORT', '5432'),
     }
 }
 
