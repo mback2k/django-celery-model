@@ -9,7 +9,11 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import python_2_unicode_compatible
+
+try:
+    from six import python_2_unicode_compatible
+except ImportError:
+    from django.utils.encoding import python_2_unicode_compatible
 
 try:
     # Django >= 1.7
@@ -22,11 +26,12 @@ from celery.utils import uuid
 from celery import signals
 
 class ModelTaskMetaState(object):
-    PENDING = 0
-    STARTED = 1
-    RETRY   = 2
-    FAILURE = 3
-    SUCCESS = 4
+    PENDING =   0
+    STARTED =   1
+    RETRY   =   2
+    FAILURE =   3
+    SUCCESS =   4
+    REJECTED =  5
 
     @classmethod
     def lookup(cls, state):
@@ -48,6 +53,9 @@ class ModelTaskMetaFilterMixin(object):
     def successful(self):
         return self.filter(state=ModelTaskMetaState.SUCCESS)
 
+    def rejected(self):
+        return self.filter(state=ModelTaskMetaState.REJECTED)
+
     def running(self):
         return self.filter(Q(state=ModelTaskMetaState.PENDING)|
                            Q(state=ModelTaskMetaState.STARTED)|
@@ -55,6 +63,7 @@ class ModelTaskMetaFilterMixin(object):
 
     def ready(self):
         return self.filter(Q(state=ModelTaskMetaState.FAILURE)|
+                           Q(state=ModelTaskMetaState.REJECTED)|
                            Q(state=ModelTaskMetaState.SUCCESS))
 
 class ModelTaskMetaQuerySet(ModelTaskMetaFilterMixin, QuerySet):
@@ -74,6 +83,7 @@ class ModelTaskMeta(models.Model):
         (ModelTaskMetaState.RETRY,   'RETRY'),
         (ModelTaskMetaState.FAILURE, 'FAILURE'),
         (ModelTaskMetaState.SUCCESS, 'SUCCESS'),
+        (ModelTaskMetaState.REJECTED, 'REJECTED'),
     )
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -120,6 +130,9 @@ class TaskFilterMixin(object):
     def with_successful_tasks(self):
         return self.filter(tasks__state=ModelTaskMetaState.SUCCESS)
 
+    def with_rejected_tasks(self):
+        return self.filter(tasks__state=ModelTaskMetaState.REJECTED)
+
     def with_running_tasks(self):
         return self.filter(Q(tasks__state=ModelTaskMetaState.PENDING)|
                            Q(tasks__state=ModelTaskMetaState.STARTED)|
@@ -127,6 +140,7 @@ class TaskFilterMixin(object):
 
     def with_ready_tasks(self):
         return self.filter(Q(tasks__state=ModelTaskMetaState.FAILURE)|
+                           Q(tasks__state=ModelTaskMetaState.REJECTED)|
                            Q(tasks__state=ModelTaskMetaState.SUCCESS))
 
     def without_tasks(self):
@@ -147,6 +161,9 @@ class TaskFilterMixin(object):
     def without_successful_tasks(self):
         return self.exclude(tasks__state=ModelTaskMetaState.SUCCESS)
 
+    def without_rejected_tasks(self):
+        return self.exclude(tasks__state=ModelTaskMetaState.REJECTED)
+
     def without_running_tasks(self):
         return self.exclude(Q(tasks__state=ModelTaskMetaState.PENDING)|
                             Q(tasks__state=ModelTaskMetaState.STARTED)|
@@ -154,6 +171,7 @@ class TaskFilterMixin(object):
 
     def without_ready_tasks(self):
         return self.exclude(Q(tasks__state=ModelTaskMetaState.FAILURE)|
+                            Q(tasks__state=ModelTaskMetaState.REJECTED)|
                             Q(tasks__state=ModelTaskMetaState.SUCCESS))
 
 class TaskQuerySet(TaskFilterMixin, QuerySet):

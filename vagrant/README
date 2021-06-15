@@ -1,0 +1,23 @@
+CREATES A VAGRANT ENVIRONMENT TO FACILITATE LOCAL TESTING
+
+========
+USAGE:
+========
+To run tests:
+    cd to this directory and then issue the following commands:
+        vagrant up
+        vagrant ssh
+        bash /vagrant/vagrant/runtox.sh
+    
+    to run with verbose output:
+        bash /vagrant/vagrant/runtox.sh -vv -- -v 2
+    
+    to run a specific test:
+        bash /vagrant/vagrant/runtox.sh -vv -- -v 2 path.to.test
+    
+
+To clean after tests run:
+    rm -R /tmp/vagrant
+
+To make migrations (after running tests to create tox environment):
+    /tmp/vagrant/.tox/py35/bin/python /vagrant/manage.py makemigrations
